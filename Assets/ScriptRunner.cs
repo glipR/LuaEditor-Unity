@@ -16,12 +16,12 @@ public class ScriptRunner : MonoBehaviour {
 
     void Start() {
         instace = this;
-        UserData.RegisterProxyType<BoxApiProxy, BoxApiType>(r => new BoxApiProxy(r));
+        UserData.RegisterProxyType<HanoiApiProxy, HanoiApiType>(r => new HanoiApiProxy(r));
         // MAKE THIS SOFT SANDBOX
         script = new Script(MoonSharp.Interpreter.CoreModules.Preset_Default);
         ((ScriptLoaderBase)script.Options.ScriptLoader).ModulePaths = new string[] { "Assets/Resources/MoonSharp/Scripts/?" };
         script.Options.DebugPrint = s => { Debug.Log(s); };
-        script.Globals["api"] = new BoxApiType();
+        script.Globals["api"] = new HanoiApiType();
     }
 
 }
