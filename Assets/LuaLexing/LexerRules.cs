@@ -29,7 +29,8 @@ namespace LuaParser
         /// </summary>
         public static Regex[] Matches = new Regex[]{
             new Regex(@"^[\t\n\r \xA0]+"), //whitespace
-            new Regex("^(?:\\\"(?:[^\"\\]|\\[\\s\\S])*(?:\"|$)|\'(?:[^\'\\]|\\[\\s\\S])*(?:\'|$))"), //string
+            new Regex("^\'(((?<=\\\\)\')?([^\n\r\'])*)*\'"), // string '
+            new Regex("^\"(((?<=\\\\)\")?([^\n\r\"])*)*\""), // string "
             new Regex(@"^--(?:\[(=*)\[[\s\S]*?(?:\]\1\]|$)|[^\r\n]*)[-]*"), //comment
             new Regex(@"^\[(=*)\[[\s\S]*?(?:\]\1\]|$)"), //multiline string vanilla
             new Regex(@"^(?:and|break|do|else|elseif|end|false|for|function|if|in|local|nil|not|or|repeat|return|then|true|until|while)\b"), //keywords
@@ -45,13 +46,14 @@ namespace LuaParser
         public static LexerRule[] Rules = new LexerRule[] {
             new LexerRule(Matches[0],"whitespace"),
             new LexerRule(Matches[1],"string"),
-            new LexerRule(Matches[2],"comment"),
-            new LexerRule(Matches[3],"string"),
-            new LexerRule(Matches[4],"keyword"),
-            new LexerRule(Matches[5],"operator"),
-            new LexerRule(Matches[6],"number"),
-            new LexerRule(Matches[7],"identifier"),
-            new LexerRule(Matches[8],"punctuation")
+            new LexerRule(Matches[2],"string"),
+            new LexerRule(Matches[3],"comment"),
+            new LexerRule(Matches[4],"string"),
+            new LexerRule(Matches[5],"keyword"),
+            new LexerRule(Matches[6],"operator"),
+            new LexerRule(Matches[7],"number"),
+            new LexerRule(Matches[8],"identifier"),
+            new LexerRule(Matches[9],"punctuation")
         };
     }
 }
