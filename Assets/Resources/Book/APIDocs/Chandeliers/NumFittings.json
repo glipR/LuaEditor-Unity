@@ -1,0 +1,13 @@
+{
+    "method_name": "Chandeliers.NumFittings()",
+    "arguments": [],
+    "description": "",
+    "returns": "The number of fittings in the game",
+    "example_usage": {
+        "args": {
+            "numChandeliers": 1,
+            "numFittings": 3
+        },
+        "code": "a = Chandeliers.NumFittings()\nprint(\"There are\", a, \"fittings!\")\nChandeliers.MoveChandelier(0, 2)\nChandeliers.MoveChandelier(2, 1)"
+    }
+}

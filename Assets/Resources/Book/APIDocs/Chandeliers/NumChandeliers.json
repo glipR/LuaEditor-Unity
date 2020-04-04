@@ -1,0 +1,13 @@
+{
+    "method_name": "Chandeliers.NumChandeliers()",
+    "arguments": [],
+    "description": "",
+    "returns": "The number of chandeliers in the game",
+    "example_usage": {
+        "args": {
+            "numChandeliers": 5,
+            "numFittings": 2
+        },
+        "code": "a = Chandeliers.NumChandeliers()\nprint(\"There are\", a, \"chandeliers!\")"
+    }
+}

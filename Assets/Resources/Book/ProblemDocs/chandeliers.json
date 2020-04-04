@@ -1,0 +1,51 @@
+{
+    "sections": [
+        {
+            "title": "The Challenge",
+            "blocks": [
+                {
+                    "type": "paragraph",
+                    "content": "You have been tasked to move a chandelier from one side of the room to the other.\nHowever, these chandeliers are rather heavy, and must be moved so that:"
+                },
+                {
+                    "type": "list",
+                    "content": [
+                        "Only one frame of the chandelier can be moved at a time, they are too heavy for you otherwise.",
+                        "Frames of a chandelier cannot hold the weight of larger frames below them. A chandelier frame must always be directly below the ceiling fitting, or a larger frame."
+                    ]
+                },
+                {
+                    "type": "video",
+                    "content": "Visual/Chandeliers/rules.mp4"
+                },
+                {
+                    "type": "paragraph",
+                    "content": "Fittings are arranged in a line, and referenced from `0` to `n`. You always want to go from fitting `0` to fitting `n`."
+                }
+            ],
+            "type": "preamble"
+        },
+        {
+            "title": "Tools",
+            "blocks": [
+                {
+                    "type": "paragraph",
+                    "content": "We only need to get information about the size of the chandelier, the ceiling fittings available.\nAdditionally we can move the chandeliers from fitting to fitting."
+                },
+                {
+                    "type": "api_doc",
+                    "content": "APIDocs/Chandelier/NumChandeliers.json"
+                },
+                {
+                    "type": "api_doc",
+                    "content": "APIDocs/Chandelier/NumFittings.json"
+                },
+                {
+                    "type": "api_doc",
+                    "content": "APIDocs/Chandelier/MoveChandelier.json"
+                }
+            ],
+            "type": "tools"
+        }
+    ]
+}

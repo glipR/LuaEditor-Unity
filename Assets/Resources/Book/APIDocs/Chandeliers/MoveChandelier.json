@@ -1,0 +1,16 @@
+{
+    "method_name": "Chandeliers.MoveChandelier(begin, end)",
+    "arguments": [
+        "begin: Number representing the fitting number your chandelier should start at.",
+        "end: Number representing the fitting number your chandelier should end at."
+    ],
+    "description": "Tries to move the chandelier from one fitting to another. Will fail if this move is invalid due to the rules, or if there is nothing to move.",
+    "returns": "The number of chandeliers in the game",
+    "example_usage": {
+        "args": {
+            "numChandeliers": 3,
+            "numFittings": 3
+        },
+        "code": "Chandeliers.MoveChandelier(0, 2)\nChandeliers.MoveChandelier(0, 1)\nChandeliers.MoveChandelier(1, 2)"
+    }
+}
