@@ -12,9 +12,9 @@ public class BoxOptions {
 public class BoxAPIDefinition: IAPIDef {
     public new string docLink = "test";
 
-    public override void Initialise(GameObject par) {
+    public override IEnumerator Initialise(GameObject par) {
         apiPrefab = Resources.Load<GameObject>("Prefabs/API/Box");
-        base.Initialise(par);
+        yield return base.Initialise(par);
     }
 
     public override void AddToScript(Script s) {
@@ -22,12 +22,12 @@ public class BoxAPIDefinition: IAPIDef {
         s.Globals["Box"] = new BoxApiType();
     }
 
-    public override void Load(string optionString) {
+    public override IEnumerator Load(string optionString) {
         var options = JsonUtility.FromJson<BoxOptions>(optionString);
-        Load(options);
+        yield return Load(options);
     }
 
-    public void Load(BoxOptions hs) {
-
+    public IEnumerator Load(BoxOptions hs) {
+        yield return null;
     }
 }

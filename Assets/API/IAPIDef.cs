@@ -15,10 +15,11 @@ public abstract class IAPIDef {
     // * An options class - which defines the different ways the scene can be loaded
 
     // String Serialized version of options class.
-    public abstract void Load(string optionString);
+    public abstract IEnumerator Load(string optionString);
 
-    public virtual void Initialise(GameObject par) {
+    public virtual IEnumerator Initialise(GameObject par) {
         GameObject.Instantiate(apiPrefab, par.transform);
+        yield return null;
     }
 
 }

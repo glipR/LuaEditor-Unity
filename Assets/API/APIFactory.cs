@@ -27,14 +27,14 @@ public static class ApiFactory {
         throw new System.Exception("Invalid API Name: " + name);
     }
 
-    public static void LoadAPI(APILoadingOptions options) {
+    public static IEnumerator LoadAPI(APILoadingOptions options) {
         var api = GetApi(options.api);
         var g = GameObject.Find("ApiPanel");
         foreach (Transform child in g.transform) {
             GameObject.Destroy(child.gameObject);
         }
-        api.Initialise(g);
-        api.Load(options.args);
+        yield return api.Initialise(g);
+        yield return api.Load(options.args);
         ScriptRunner.instance.Initialise();
         api.AddToScript(ScriptRunner.instance.script);
     }

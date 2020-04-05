@@ -25,8 +25,8 @@ public class ScriptRunner : MonoBehaviour {
         var opts = new APILoadingOptions();
         opts.api = "Hanoi";
         opts.code = "-- test program\nprint(Chandelier.NumFittings())";
-        opts.args = "{\"numFittings\": 3, \"numChandeliers\": 3}";
-        ApiFactory.LoadAPI(opts);
+        opts.args = "{\"numFittings\": 3, \"numChandeliers\": 5}";
+        StartCoroutine(ApiFactory.LoadAPI(opts));
     }
 
 }

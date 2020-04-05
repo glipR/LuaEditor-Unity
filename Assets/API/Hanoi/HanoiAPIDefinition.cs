@@ -12,9 +12,10 @@ public class HanoiOptions {
 public class HanoiAPIDefinition: IAPIDef {
     public new string docLink = "test";
 
-    public override void Initialise(GameObject par) {
-        apiPrefab = Resources.Load<GameObject>("Prefabs/API/Hanoi");
-        base.Initialise(par);
+    public override IEnumerator Initialise(GameObject par) {
+        apiPrefab = Resources.Load<GameObject>("Prefabs/API/Hanoi/Hanoi");
+        yield return base.Initialise(par);
+        while (!HanoiApi.ready) yield return null;
     }
 
     public override void AddToScript(Script s) {
@@ -22,12 +23,12 @@ public class HanoiAPIDefinition: IAPIDef {
         s.Globals["Chandeliers"] = new HanoiApiType();
     }
 
-    public override void Load(string optionString) {
+    public override IEnumerator Load(string optionString) {
         var options = JsonUtility.FromJson<HanoiOptions>(optionString);
-        Load(options);
+        yield return Load(options);
     }
 
-    public void Load(HanoiOptions hs) {
-
+    public IEnumerator Load(HanoiOptions hs) {
+        yield return HanoiApi.instance.Instantiate(hs);
     }
 }
