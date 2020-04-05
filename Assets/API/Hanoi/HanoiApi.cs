@@ -38,6 +38,14 @@ public class HanoiApi : MonoBehaviour {
         f();
     }
 
+    public int NumRings() {
+        return Rings.Count;
+    }
+
+    public int NumRungs() {
+        return Rungs.Count;
+    }
+
     public void MoveRing(int startIndex, int endIndex) {
         if (startIndex < 0 || startIndex >= Rings.Count)
             throw new System.Exception("Invalid Rung index!");

@@ -7,6 +7,7 @@
     "description": "Tries to move the chandelier from one fitting to another. Will fail if this move is invalid due to the rules, or if there is nothing to move.",
     "returns": "The number of chandeliers in the game",
     "example_usage": {
+        "api": "Hanoi",
         "args": {
             "numChandeliers": 3,
             "numFittings": 3

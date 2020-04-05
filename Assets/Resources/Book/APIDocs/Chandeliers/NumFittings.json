@@ -4,6 +4,7 @@
     "description": "",
     "returns": "The number of fittings in the game",
     "example_usage": {
+        "api": "Hanoi",
         "args": {
             "numChandeliers": 1,
             "numFittings": 3

@@ -7,6 +7,14 @@ public class HanoiApiType {
     public void MoveRing(int x, int y) {
         HanoiApi.instance.MoveRing(x, y);
     }
+
+    public int NumRings() {
+        return HanoiApi.instance.NumRings();
+    }
+
+    public int NumRungs() {
+        return HanoiApi.instance.NumRungs();
+    }
 }
 
 public class HanoiApiProxy {
@@ -16,7 +24,15 @@ public class HanoiApiProxy {
         this.obj = p;
     }
 
-    public void MoveRing(int x, int y) {
+    public void MoveChandelier(int x, int y) {
         this.obj.MoveRing(x, y);
+    }
+
+    public int NumChandeliers() {
+        return this.obj.NumRings();
+    }
+
+    public int NumFittings() {
+        return this.obj.NumRungs();
     }
 }

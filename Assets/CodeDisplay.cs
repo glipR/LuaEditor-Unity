@@ -19,7 +19,7 @@ public class CodeDisplay : MonoBehaviour {
     }
 
     public void executeText() {
-        ScriptRunner.instace.runText(stringText);
+        ScriptRunner.instance.runText(stringText);
     }
 
 }

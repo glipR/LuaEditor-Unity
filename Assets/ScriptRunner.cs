@@ -7,21 +7,26 @@ using MoonSharp.Interpreter.Loaders;
 
 public class ScriptRunner : MonoBehaviour {
 
-    Script script;
-    public static ScriptRunner instace;
+    public Script script;
+    public static ScriptRunner instance;
 
     public void runText(string t) {
         script.DoString(t);
     }
 
-    void Start() {
-        instace = this;
-        UserData.RegisterProxyType<HanoiApiProxy, HanoiApiType>(r => new HanoiApiProxy(r));
-        // MAKE THIS SOFT SANDBOX
+    public void Initialise() {
         script = new Script(MoonSharp.Interpreter.CoreModules.Preset_Default);
-        ((ScriptLoaderBase)script.Options.ScriptLoader).ModulePaths = new string[] { "Assets/Resources/MoonSharp/Scripts/?" };
         script.Options.DebugPrint = s => { Debug.Log(s); };
-        script.Globals["api"] = new HanoiApiType();
+        ((ScriptLoaderBase)script.Options.ScriptLoader).ModulePaths = new string[] { "Assets/Resources/MoonSharp/Scripts/?" };
+    }
+
+    void Start() {
+        instance = this;
+        var opts = new APILoadingOptions();
+        opts.api = "Hanoi";
+        opts.code = "-- test program\nprint(Chandelier.NumFittings())";
+        opts.args = "{\"numFittings\": 3, \"numChandeliers\": 3}";
+        ApiFactory.LoadAPI(opts);
     }
 
 }
