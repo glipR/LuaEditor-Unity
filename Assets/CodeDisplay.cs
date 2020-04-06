@@ -34,9 +34,9 @@ public class CodeDisplay : MonoBehaviour {
             if (c.bottomRight.x != 0 || c.bottomRight.y != 0) {
                 i ++;
                 if (i == inputField.caretPosition) {
-                    List<string> s = new List<string>();
+                    List<(int, string)> s = new List<(int, string)>();
                     foreach (var x in suggest) {
-                        s.Add(x.name);
+                        s.Add((x.toRemove, x.name));
                     }
                     if (s.Count == 0) {
                         Tooltip.Hide();

@@ -28,11 +28,13 @@ public static class CodeStyler {
         public string name;
         public string type;
         public int occurrences;
+        public int toRemove;
 
-        public SuggestionData(string s1, string s2, int d1) {
+        public SuggestionData(string s1, string s2, int d1, int d2) {
             name = s1;
             type = s2;
             occurrences = d1;
+            toRemove = d2;
         }
     }
 
@@ -58,7 +60,7 @@ public static class CodeStyler {
                 }
             }
             if (!found) {
-                suggestions.Add(new SuggestionData(lexerResult.Tokens[i].Value, lexerResult.Tokens[i].Type, 1));
+                suggestions.Add(new SuggestionData(lexerResult.Tokens[i].Value, lexerResult.Tokens[i].Type, 1, 0));
             }
         }
         var toRemove = new List<int>();
@@ -77,7 +79,7 @@ public static class CodeStyler {
     public static void SetSuggestions(List<(string name, string type)> suggest) {
         suggestions = new List<SuggestionData>();
         foreach (var s in suggest) {
-            suggestions.Add(new SuggestionData(s.name, s.type, 0));
+            suggestions.Add(new SuggestionData(s.name, s.type, 0, 0));
         }
     }
 
@@ -119,6 +121,7 @@ public static class CodeStyler {
                 List<(SuggestionData, float)> scored = new List<(SuggestionData, float)>();
                 string tokenLower = lexerResult.Tokens[i].Value.ToLower();
                 for (int j=0; j<suggestions.Count; j++) {
+                    suggestions[j].toRemove = lexerResult.Tokens[i].Value.Length;
                     // Rank suggestion.
                     int firstMatch = -1;
                     int lastMatch = -1;

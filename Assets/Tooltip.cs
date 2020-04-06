@@ -10,6 +10,8 @@ public class Tooltip : MonoBehaviour {
     private RectTransform rect;
     private Transform background;
     public GameObject textPrefab;
+    private bool open;
+    private List<(int toRemove, string toInsert)> suggestions;
 
     private void Awake() {
         instance = this;
@@ -20,6 +22,7 @@ public class Tooltip : MonoBehaviour {
     }
 
     private void ShowTooltip(List<string> s) {
+        open = true;
         gameObject.SetActive(true);
 
         foreach (Transform t in background) {
@@ -44,16 +47,28 @@ public class Tooltip : MonoBehaviour {
     }
 
     private void HideTooltip() {
+        open = false;
         gameObject.SetActive(false);
     }
 
-    public static void SetTooltip(List<string> s, Vector3 worldPos) {
-        instance.ShowTooltip(s);
+    public static void SetTooltip(List<(int toRemove, string toInsert)> s, Vector3 worldPos) {
+        var r = new List<string>();
+        foreach (var t in s) r.Add(t.toInsert);
+        instance.suggestions = s;
+        instance.ShowTooltip(r);
         var sd = instance.GetComponent<RectTransform>().sizeDelta;
         instance.transform.position = worldPos + new Vector3(sd.x / 2f, -sd.y / 2f, 0);
     }
 
     public static void Hide() {
         instance.HideTooltip();
+    }
+
+    public static bool suggestionsOpen() {
+        return instance.open;
+    }
+
+    public static (int toRemove, string toInsert) currentSuggestion() {
+        return instance.suggestions[0];
     }
 }
