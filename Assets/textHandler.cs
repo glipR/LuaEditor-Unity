@@ -12,12 +12,21 @@ public class textHandler : MonoBehaviour {
        inputField.handleEnterPress.AddListener(HandleEnter);
        inputField.handleUpPress.AddListener((bool x) => HandleUpDown(x, true));
        inputField.handleDownPress.AddListener((bool x) => HandleUpDown(x, false));
+       inputField.handleEscapePress.AddListener(HandleEscape);
    }
    public void HandleEnter() {
        if (Tooltip.suggestionsOpen()) {
            inputField.RemoveLastAndInsert(Tooltip.currentSuggestion());
        } else {
            inputField.Append('\n');
+       }
+   }
+
+   public void HandleEscape() {
+       if (Tooltip.suggestionsOpen()) {
+           Tooltip.Hide();
+       } else {
+           inputField.EscapeSelection();
        }
    }
 

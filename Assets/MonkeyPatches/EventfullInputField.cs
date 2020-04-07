@@ -1766,6 +1766,7 @@ namespace TMPro
         }
 
         public UnityEvent handleEnterPress = new UnityEvent();
+        public UnityEvent handleEscapePress = new UnityEvent();
         public class BoolEvent : UnityEvent<bool> {}
         public BoolEvent handleUpPress = new BoolEvent();
         public BoolEvent handleDownPress = new BoolEvent();
@@ -1906,9 +1907,10 @@ namespace TMPro
 
                 case KeyCode.Escape:
                     {
-                        m_ReleaseSelection = true;
-                        m_WasCanceled = true;
-                        return EditState.Finish;
+                        handleEscapePress.Invoke();
+                        if (m_ReleaseSelection)
+                            return EditState.Finish;
+                        return EditState.Continue;
                     }
             }
 
@@ -1940,6 +1942,11 @@ namespace TMPro
                 }
             }
             return EditState.Continue;
+        }
+
+        public void EscapeSelection() {
+            m_ReleaseSelection = true;
+            m_WasCanceled = true;
         }
 
         protected virtual bool IsValidChar(char c)
