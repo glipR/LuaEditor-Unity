@@ -6,7 +6,7 @@ using TMPro;
 public class CodeDisplay : MonoBehaviour {
 
     public TextMeshProUGUI text;
-    public TMP_InputField inputField;
+    public EventfullInputField inputField;
     public string stringText;
 
     private void Start() {

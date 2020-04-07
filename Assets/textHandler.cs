@@ -5,18 +5,35 @@ using TMPro;
 
 public class textHandler : MonoBehaviour {
 
-   private TMP_InputField inputField;
+   private EventfullInputField inputField;
 
    private void Start() {
-       inputField = GetComponent<TMP_InputField>();
+       inputField = GetComponent<EventfullInputField>();
        inputField.handleEnterPress.AddListener(HandleEnter);
+       inputField.handleUpPress.AddListener((bool x) => HandleUpDown(x, true));
+       inputField.handleDownPress.AddListener((bool x) => HandleUpDown(x, false));
    }
-
    public void HandleEnter() {
        if (Tooltip.suggestionsOpen()) {
            inputField.RemoveLastAndInsert(Tooltip.currentSuggestion());
        } else {
            inputField.Append('\n');
+       }
+   }
+
+   public void HandleUpDown(bool shift, bool dir) {
+       if (shift || !Tooltip.suggestionsOpen()) {
+           if (dir) {
+               inputField.MoveUp(shift);
+           } else {
+               inputField.MoveDown(shift);
+           }
+       } else {
+           if (dir) {
+               Tooltip.ShiftSelectionUp();
+           } else {
+               Tooltip.ShiftSelectionDown();
+           }
        }
    }
 

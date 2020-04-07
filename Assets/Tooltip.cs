@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class Tooltip : MonoBehaviour {
@@ -12,6 +13,7 @@ public class Tooltip : MonoBehaviour {
     public GameObject textPrefab;
     private bool open;
     private List<(int toRemove, string toInsert)> suggestions;
+    public int suggestionIndex;
 
     private void Awake() {
         instance = this;
@@ -21,7 +23,29 @@ public class Tooltip : MonoBehaviour {
         Hide();
     }
 
+    private void TryShiftSelectionUp() {
+        var tm = background.GetChild(suggestionIndex).GetComponent<Image>();
+        tm.color = new Color(0, 0, 0, 0);
+        if (suggestionIndex != 0) {
+            suggestionIndex --;
+        }
+        Debug.Log(suggestionIndex);
+        tm = background.GetChild(suggestionIndex).GetComponent<Image>();
+        tm.color = new Color(0, 50, 0, 0.5f);
+    }
+
+    private void TryShiftSelectionDown() {
+        var tm = background.GetChild(suggestionIndex).GetComponent<Image>();
+        tm.color = new Color(0, 0, 0, 0);
+        if (!(suggestionIndex >= suggestions.Count)) {
+            suggestionIndex ++;
+        }
+        tm = background.GetChild(suggestionIndex).GetComponent<Image>();
+        tm.color = new Color(0, 50, 0, 0.5f);
+    }
+
     private void ShowTooltip(List<string> s) {
+        suggestionIndex = 0;
         open = true;
         gameObject.SetActive(true);
 
@@ -30,9 +54,14 @@ public class Tooltip : MonoBehaviour {
         }
 
         Vector2 backgroundSize = new Vector2(0, 0);
+        int i=0;
         foreach (var st in s) {
             var text = Instantiate(textPrefab, background);
-            var tm = text.GetComponent<TextMeshProUGUI>();
+            if (i == 0) {
+                text.GetComponent<Image>().color = new Color(0, 50, 0, 0.5f);
+            }
+            text.name = "Tooltip " + (i++);
+            var tm = text.transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>();
             var str = st;
             if (st.Length > 14) {
                 str = st.Substring(0, 11) + "...";
@@ -69,6 +98,14 @@ public class Tooltip : MonoBehaviour {
     }
 
     public static (int toRemove, string toInsert) currentSuggestion() {
-        return instance.suggestions[0];
+        return instance.suggestions[instance.suggestionIndex];
+    }
+
+    public static void ShiftSelectionUp() {
+        instance.TryShiftSelectionUp();
+    }
+
+    public static void ShiftSelectionDown() {
+        instance.TryShiftSelectionDown();
     }
 }

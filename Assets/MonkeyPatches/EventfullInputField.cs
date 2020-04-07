@@ -1,5 +1,3 @@
-// PATH: Library\PackageCache\com.unity.textmeshpro@2.0.1\Scripts\Runtime\TMP_InputField.cs
-/*
 //#define TMP_DEBUG_MODE
 
 using System;
@@ -20,7 +18,7 @@ namespace TMPro
     /// Editable text input field.
     /// </summary>
     [AddComponentMenu("UI/TextMeshPro - Input Field", 11)]
-    public class TMP_InputField : Selectable,
+    public class EventfullInputField : Selectable,
         IUpdateSelectedHandler,
         IBeginDragHandler,
         IDragHandler,
@@ -342,7 +340,7 @@ namespace TMPro
 
 
 
-        protected TMP_InputField()
+        protected EventfullInputField()
         {
             SetTextComponentWrapMode();
         }
@@ -1768,6 +1766,9 @@ namespace TMPro
         }
 
         public UnityEvent handleEnterPress = new UnityEvent();
+        public class BoolEvent : UnityEvent<bool> {}
+        public BoolEvent handleUpPress = new BoolEvent();
+        public BoolEvent handleDownPress = new BoolEvent();
         protected EditState KeyPressed(Event evt)
         {
             var currentEventModifiers = evt.modifiers;
@@ -1869,13 +1870,13 @@ namespace TMPro
 
                 case KeyCode.UpArrow:
                     {
-                        MoveUp(shift);
+                        handleUpPress.Invoke(shift);
                         return EditState.Continue;
                     }
 
                 case KeyCode.DownArrow:
                     {
-                        MoveDown(shift);
+                        handleDownPress.Invoke(shift);
                         return EditState.Continue;
                     }
 
@@ -2446,7 +2447,7 @@ namespace TMPro
         }
 
 
-        private void MoveDown(bool shift)
+        public void MoveDown(bool shift)
         {
             MoveDown(shift, true);
         }
@@ -2479,7 +2480,7 @@ namespace TMPro
             #endif
         }
 
-        private void MoveUp(bool shift)
+        public void MoveUp(bool shift)
         {
             MoveUp(shift, true);
         }
@@ -4153,4 +4154,3 @@ namespace TMPro
         }
     }
 }
-*/
