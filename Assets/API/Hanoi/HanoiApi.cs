@@ -10,10 +10,10 @@ public class HanoiApi : MonoBehaviour {
     public static bool ready = false;
 
     public int actions = 0;
-    private List<Func<bool> > tweens = new List<Func<bool> >();
     public List<GameObject> Rungs;
     public List<GameObject> Rings;
     public List<List<(int, Vector3)> > RingMatrix;
+    public List<float> Tweens;
 
     public float ringHeight;
     public float rungWidth;
@@ -40,6 +40,7 @@ public class HanoiApi : MonoBehaviour {
             g.name = "Rung " + i;
             Rungs.Add(g);
         }
+        Tweens = new List<float>();
         for (int i=1; i<= hs.numChandeliers; i++) {
             var g = Instantiate(ringPrefab, transform);
             g.GetComponent<RectTransform>().sizeDelta = new Vector2(50 + 25 * (hs.numChandeliers - i), 40);
@@ -80,19 +81,31 @@ public class HanoiApi : MonoBehaviour {
         ready = false;
     }
 
-    private void RunTween() {
-        if (tweens.Count == 0) return;
-        var f = tweens[0];
-        tweens.RemoveAt(0);
-        f();
-    }
-
     public int NumRings() {
         return Rings.Count;
     }
 
     public int NumRungs() {
         return Rungs.Count;
+    }
+
+    public IEnumerator MoveRingCoroutine(RectTransform rectTransform, Vector3 currentPos, Vector3 raise, Vector3 aboveNew, Vector3 newLocation) {
+        float num = UnityEngine.Random.Range(0f, 1f);
+        Tweens.Add(num);
+        while (Tweens[0] != num) yield return null;
+        rectTransform.gameObject.Tween(rectTransform.gameObject, 0f, 1f, 0.3f, TweenScaleFunctions.QuadraticEaseIn, (t)=> {
+            Vector3 project = (raise - currentPos) * t.CurrentValue + currentPos;
+            rectTransform.localPosition = project;
+        }).ContinueWith(new FloatTween().Setup(0f, 1f, 0.5f, TweenScaleFunctions.Linear, (t) => {
+            Vector3 project = (aboveNew - raise) * t.CurrentValue + raise;
+            rectTransform.localPosition = project;
+        })).ContinueWith(new FloatTween().Setup(0f, 1f, 0.3f, TweenScaleFunctions.QuadraticEaseOut, (t) => {
+            Vector3 project = (newLocation - aboveNew) * t.CurrentValue + aboveNew;
+            rectTransform.localPosition = project;
+        }, (t)=> {
+            actions -= 1;
+            Tweens.RemoveAt(0);
+        }));
     }
 
     public void MoveRing(int startIndex, int endIndex) {
@@ -107,7 +120,6 @@ public class HanoiApi : MonoBehaviour {
         var v = RingMatrix[startIndex][RingMatrix[startIndex].Count - 1];
         RingMatrix[startIndex].RemoveAt(RingMatrix[startIndex].Count - 1);
         actions ++;
-        bool done = false;
         var rt = Rings[v.Item1].GetComponent<RectTransform>();
         Vector3 endRungPos = ChandelierPosition(endIndex, 0);
         Vector3 cPos = v.Item2;
@@ -118,25 +130,7 @@ public class HanoiApi : MonoBehaviour {
         aboveNew.y = endRungPos.y + 220;
         v.Item2 = newLocation;
         RingMatrix[endIndex].Add(v);
-        tweens.Add(() => {rt.gameObject.Tween(rt.gameObject, 0f, 1f, 0.3f, TweenScaleFunctions.QuadraticEaseIn, (t)=> {
-            Vector3 project = (raise - cPos) * t.CurrentValue + cPos;
-            rt.localPosition = project;
-        }).ContinueWith(new FloatTween().Setup(0f, 1f, 0.5f, TweenScaleFunctions.Linear, (t) => {
-            Vector3 project = (aboveNew - raise) * t.CurrentValue + raise;
-            rt.localPosition = project;
-        })).ContinueWith(new FloatTween().Setup(0f, 1f, 0.3f, TweenScaleFunctions.QuadraticEaseOut, (t) => {
-            Vector3 project = (newLocation - aboveNew) * t.CurrentValue + aboveNew;
-            rt.localPosition = project;
-        })).ContinueWith(new FloatTween().Setup(0f, 1f, 0.01f, TweenScaleFunctions.Linear, (t)=> {
-            if (!done) {
-                done = true;
-                actions -= 1;
-                RunTween();
-            }
-        })); return true; });
-        if (actions == 1) {
-            RunTween();
-        }
+        StartCoroutine(MoveRingCoroutine(rt, cPos, raise, aboveNew, newLocation));
     }
 
 }
