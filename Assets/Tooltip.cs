@@ -53,6 +53,8 @@ public class Tooltip : MonoBehaviour {
             Destroy(t.gameObject);
         }
 
+        // Temporarily make massive to ensure preferredWidth and Height are correct.
+        rect.sizeDelta = new Vector2(1000, 1000);
         Vector2 backgroundSize = new Vector2(0, 0);
         int i=0;
         foreach (var st in s) {
