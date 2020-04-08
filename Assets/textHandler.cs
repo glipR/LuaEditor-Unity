@@ -17,6 +17,7 @@ public class textHandler : MonoBehaviour {
    public void HandleEnter() {
        if (Tooltip.suggestionsOpen()) {
            inputField.RemoveLastAndInsert(Tooltip.currentSuggestion());
+           Tooltip.Hide();
        } else {
            inputField.Append('\n');
        }

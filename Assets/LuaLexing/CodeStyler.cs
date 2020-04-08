@@ -25,13 +25,13 @@ public static class CodeStyler {
     public static int maximumSuggestions = 5;
 
     public class SuggestionData {
-        public string name;
+        public List<string> namePath;
         public string type;
         public int occurrences;
         public int toRemove;
 
-        public SuggestionData(string s1, string s2, int d1, int d2) {
-            name = s1;
+        public SuggestionData(List<string> s1, string s2, int d1, int d2) {
+            namePath = s1;
             type = s2;
             occurrences = d1;
             toRemove = d2;
@@ -39,6 +39,19 @@ public static class CodeStyler {
     }
 
     public static List<SuggestionData> suggestions;
+
+    private static List<string> namePath(int tokenIndex) {
+        var res = new List<string>();
+        while (true) {
+            res.Insert(0, lexerResult.Tokens[tokenIndex].Value);
+            if (lexerResult.Tokens[tokenIndex].Type == "identifier" && tokenIndex > 1) {
+                if (lexerResult.Tokens[tokenIndex - 1].Value == ".") {
+                    tokenIndex -= 2;
+                } else break;
+            } else break;
+        }
+        return res;
+    }
 
     public static void SetString(string luaCode) {
         original = luaCode;
@@ -53,14 +66,20 @@ public static class CodeStyler {
             if (lexerResult.Tokens[i].Type != "identifier") continue;
             totalIdentifiers ++;
             bool found = false;
+            var names = namePath(i);
             for (int j=0; j<suggestions.Count; j++) {
-                if (suggestions[j].type == lexerResult.Tokens[i].Type && suggestions[j].name == lexerResult.Tokens[i].Value) {
+                bool same = false;
+                if (suggestions[j].namePath.Count == names.Count) {
+                    same = true;
+                    for (int k=0; k<names.Count; k++) if (names[k] != suggestions[j].namePath[k]) same = false;
+                }
+                if (same) {
                     found = true;
                     suggestions[j].occurrences ++;
                 }
             }
             if (!found) {
-                suggestions.Add(new SuggestionData(lexerResult.Tokens[i].Value, lexerResult.Tokens[i].Type, 1, 0));
+                suggestions.Add(new SuggestionData(names, lexerResult.Tokens[i].Type, 1, 0));
             }
         }
         var toRemove = new List<int>();
@@ -76,8 +95,14 @@ public static class CodeStyler {
         }
     }
 
-    public static void SetSuggestions(List<(string name, string type)> suggest) {
+    public static void SetSuggestions(List<(List<string> name, string type)> suggest) {
         suggestions = new List<SuggestionData>();
+        foreach (var s in suggest) {
+            suggestions.Add(new SuggestionData(s.name, s.type, 0, 0));
+        }
+    }
+
+    public static void AddSuggestions(List<(List<string> name, string type)> suggest) {
         foreach (var s in suggest) {
             suggestions.Add(new SuggestionData(s.name, s.type, 0, 0));
         }
@@ -116,23 +141,39 @@ public static class CodeStyler {
         var res = new List<SuggestionData>();
         for (int i=0; i<lexerResult.Tokens.Length; i++) {
             if (lexerResult.Tokens[i].Location.Position + lexerResult.Tokens[i].Value.Length == caretPos) {
-                if (lexerResult.Tokens[i].Type != "identifier") return res;
-                // TODO: Make good suggestions with substring matching, and ignoring itself if its the only identifier.
+                if (lexerResult.Tokens[i].Type != "identifier" && lexerResult.Tokens[i].Value != ".") return res;
+                if (lexerResult.Tokens[i].Value == "." && i == 0) return res;
+                string endMatch;
+                List<string> prePathMatch;
+                if (lexerResult.Tokens[i].Type == "identifier") {
+                    prePathMatch = namePath(i);
+                    endMatch = prePathMatch[prePathMatch.Count - 1].ToLower();
+                    prePathMatch.RemoveAt(prePathMatch.Count - 1);
+                } else {
+                    endMatch = "";
+                    prePathMatch = namePath(i-1);
+                }
                 List<(SuggestionData, float)> scored = new List<(SuggestionData, float)>();
-                string tokenLower = lexerResult.Tokens[i].Value.ToLower();
                 for (int j=0; j<suggestions.Count; j++) {
-                    suggestions[j].toRemove = lexerResult.Tokens[i].Value.Length;
+                    bool same = false;
+                    if (suggestions[j].namePath.Count == prePathMatch.Count + 1) {
+                        same = true;
+                        for (int k=0; k<prePathMatch.Count; k++) if (prePathMatch[k] != suggestions[j].namePath[k]) same = false;
+                    }
+                    // Must have the exact same parent structure.
+                    if (!same) continue;
+                    suggestions[j].toRemove = endMatch.Length;
                     // Rank suggestion.
                     int firstMatch = -1;
                     int lastMatch = -1;
                     int match_index = 0;
-                    string lowerSuggestion = suggestions[j].name.ToLower();
-                    for (int k=0; k<suggestions[j].name.Length; k++) {
-                        if (tokenLower[match_index] == lowerSuggestion[k]) {
+                    string lowerSuggest = suggestions[j].namePath[suggestions[j].namePath.Count - 1].ToLower();
+                    for (int k=0; k<lowerSuggest.Length; k++) {
+                        if (match_index == endMatch.Length) break;
+                        if (endMatch[match_index] == lowerSuggest[k]) {
                             match_index ++;
                             if (match_index == 1) firstMatch = k;
                             lastMatch = k;
-                            if (match_index == lexerResult.Tokens[i].Value.Length) break;
                         }
                     }
                     float score = 0;
@@ -141,20 +182,20 @@ public static class CodeStyler {
                         score += match_index;
                         int redundantChars = lastMatch - firstMatch - match_index;
                         float nonRedundantPct = (match_index - redundantChars) / (float) match_index;
-                        float relativeSize = lexerResult.Tokens[i].Value.Length / (float) suggestions[j].name.Length;
+                        float relativeSize = lexerResult.Tokens[i].Value.Length / (float) lowerSuggest.Length;
                         // Handle larger cases
                         if (relativeSize > 1) relativeSize = 1 / relativeSize;
                         float relativeFreq = suggestions[j].occurrences / (float) totalIdentifiers;
-                        // Just some hardcoded values for now - shouldn't need to be publiccally accessible.
+                        // Just some hardcoded values for now - shouldn't need to be publically accessible.
                         score += 0.8f * nonRedundantPct;
                         score += 0.4f * (relativeSize - 0.5f);
                         score += 0.2f * relativeFreq;
-                        if (lexerResult.Tokens[i].Value == suggestions[j].name && suggestions[j].occurrences == 1) {
-                            // This is the only match
-                            score = 0;
-                        }
                     }
-                    if (score > scoreThreshold) {
+                    if (endMatch == lowerSuggest && suggestions[j].occurrences == 1) {
+                        // This is the only match, ignore
+                        continue;
+                    }
+                    if (score > scoreThreshold || (prePathMatch.Count > 0)) {
                         bool inserted = false;
                         for (int k=0; k<scored.Count; k++) {
                             if (scored[k].Item2 < score) {
@@ -170,6 +211,11 @@ public static class CodeStyler {
                             scored.RemoveAt(scored.Count - 1);
                         }
                     }
+                }
+                var y = namePath(i);
+                if ((scored.Count == 1 || (scored.Count > 1 && (scored[0].Item2 - scored[1].Item2 > 1.5f))) && scored[0].Item1.namePath[scored[0].Item1.namePath.Count - 1] == y[y.Count - 1]) {
+                    // Show nothing - The only suggestion is your element in particular - or the difference is too big.
+                    scored = new List<(SuggestionData, float)>();
                 }
                 foreach (var x in scored) {
                     res.Add(x.Item1);

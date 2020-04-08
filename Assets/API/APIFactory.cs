@@ -36,11 +36,13 @@ public static class ApiFactory {
         yield return api.Initialise(g);
         yield return api.Load(options.args);
         ScriptRunner.instance.Initialise();
-        api.AddToScript(ScriptRunner.instance.script);
-        var defaultSuggest = new List<(string name, string type)>();
+        var defaultSuggest = new List<(List<string> name, string type)>();
         foreach (var keyword in "and|break|do|else|elseif|end|false|for|function|if|in|local|nil|not|or|repeat|return|then|true|until|while".Split('|')) {
-            defaultSuggest.Add((keyword, "keyword"));
+            var l = new List<string>();
+            l.Add(keyword);
+            defaultSuggest.Add((l, "keyword"));
         }
         CodeStyler.SetSuggestions(defaultSuggest);
+        api.AddToScript(ScriptRunner.instance.script);
     }
 }
