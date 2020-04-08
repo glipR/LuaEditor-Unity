@@ -29,7 +29,6 @@ public class Tooltip : MonoBehaviour {
         if (suggestionIndex != 0) {
             suggestionIndex --;
         }
-        Debug.Log(suggestionIndex);
         tm = background.GetChild(suggestionIndex).GetComponent<Image>();
         tm.color = new Color(0, 50, 0, 0.5f);
     }
@@ -37,7 +36,7 @@ public class Tooltip : MonoBehaviour {
     private void TryShiftSelectionDown() {
         var tm = background.GetChild(suggestionIndex).GetComponent<Image>();
         tm.color = new Color(0, 0, 0, 0);
-        if (!(suggestionIndex >= suggestions.Count)) {
+        if (!(suggestionIndex >= suggestions.Count - 1)) {
             suggestionIndex ++;
         }
         tm = background.GetChild(suggestionIndex).GetComponent<Image>();
